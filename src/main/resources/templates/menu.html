@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<title>SID PROYECTOS</title>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+	<link rel="stylesheet" href="css/styles.css">
+	<link rel="stylesheet" href="css/tablaEditable.css">
+
+	<script src="js/script.js"></script>
+
+</head>
+
+<body>
+
+	<script>
+
+		function guardarCambios(id) {
+			
+			var celda = $("#" + id);
+			
+			var oldValue = celda.attr('oldvalue');
+			var newValue = celda.text();
+			var idProyecto = celda.attr('idproyecto');
+			
+			// Crear objeto de datos
+			var data = {
+				oldValue: oldValue,
+				newValue: newValue,
+				idProyecto: idProyecto,
+				idCelda: id
+			};
+
+			// Realizar la petición AJAX
+			$.ajax({
+				url: "/guardarCambios?oldValue=" 
+					+ encodeURIComponent(oldValue) + "&newValue=" 
+					+ encodeURIComponent(newValue) + "&idProyecto="
+				    + encodeURIComponent(idProyecto) + "&idCelda="
+				    + encodeURIComponent(id),
+				type: "POST",
+				data: JSON.stringify(data),
+				contentType: "application/json",
+				success: function (response) {
+					// Verificar la respuesta del controlador
+					if (response === "false") {
+						console.eror("Error");
+					}else{
+						celda.attr('oldvalue',newValue);
+					}
+				},
+				error: function () {
+					console.eror("Error al realizar la petición AJAX");
+				}
+			});
+		}
+
+
+	</script>
+
+	<h1>SID PROYECTOS</h1>
+
+	<table>
+
+		<tr>
+			<th>CODIGO</th>
+			<th>NOMBRE</th>
+		</tr>
+
+		<tr th:each="proyecto, rowStat : ${proyectos}">
+			<td contenteditable="true"
+				onblur="guardarCambios(this.id)"
+				th:attr="id=${'0-' + rowStat.index},oldValue=${proyecto.codigo},idProyecto=${proyecto.codigo}" 
+				th:text="${proyecto.codigo}">
+			</td>
+
+			<td contenteditable="true"
+				onblur="guardarCambios(this.id)"
+				th:attr="id=${'1-' + rowStat.index},oldValue=${proyecto.nombre},idProyecto=${proyecto.codigo}" 
+				th:text="${proyecto.nombre}">
+			</td>
+
+		</tr>
+
+
+	</table>
+
+</body>
+
+</html>
